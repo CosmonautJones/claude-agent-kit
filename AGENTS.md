@@ -8,8 +8,8 @@ This project uses a multi-agent development system. Seven specialized roles coor
 
 | Agent | Role | Capabilities | Key Traits |
 |-------|------|-------------|------------|
-| **full-stack-developer** | Frontend, backend, APIs, UI, data fetching | Read, write, edit files; run commands; search code | Stack-adaptive, isolated workspace, project memory |
-| **database-admin** | Schema, migrations, queries, data integrity | Read, write, edit files; run commands; search code | Stack-adaptive, isolated workspace, project memory |
+| **full-stack-developer** | C#, VB.NET, COBOL (Fujitsu), .NET interop | Read, write, edit files; run commands; search code | Stack-adaptive, isolated workspace, project memory |
+| **database-admin** | COBOL data layer, .NET interop, SQL Server, data integrity | Read, write, edit files; run commands; search code | Stack-adaptive, isolated workspace, project memory |
 | **shipper** | Git, testing, building, deployment, PRs | Run commands; read and search files | Pipeline owner, full automation access |
 | **reviewer** | Security, bugs, performance review | Read and search files only | Read-only, non-blocking except security |
 | **documentor** | Documentation creation and maintenance | Read, write, edit files; run commands; search code | Runs after tests pass |
@@ -18,32 +18,36 @@ This project uses a multi-agent development system. Seven specialized roles coor
 
 ### full-stack-developer
 
-Rapid feature implementation across the entire stack. Stack-adaptive — detects the project's tech stack on first invocation by scanning `package.json`, `requirements.txt`, `go.mod`, `Gemfile`, `Cargo.toml`, `composer.json` and tailors approach accordingly.
+Feature implementation across the Global Shop Solutions stack. Detects project context by scanning `.sln`, `.csproj`, `.vbproj`, COBOL copybooks (`.cpy`), and `.cob`/`.cobol` source files.
+
+**Primary languages:** C#, VB.NET, COBOL (Fujitsu NetCOBOL)
 
 **Responsibilities:**
-- All frontend and backend development
-- API routes, endpoints, and integrations
-- UI components following project conventions
-- Forms with validation, data fetching, state management
-- Minimal tests for critical paths only (auth, payments, data loss)
+- C# and VB.NET application development (.NET Framework / .NET 6+)
+- COBOL program maintenance and new development (Fujitsu NetCOBOL)
+- Interop between .NET managed code and COBOL modules
+- Windows Forms, WPF, or web UI following project conventions
+- Minimal tests for critical paths only (data integrity, business logic, interop boundaries)
 
-**Boundaries:** Does not modify database migrations directly (delegates to database-admin). Does not push to main without review.
+**Boundaries:** Does not modify the COBOL data layer or copybook definitions directly (delegates to database-admin). Does not push to main without review.
 
-**Tech-stack skills available:** `nextjs-app-router`, `shadcn-components`, `supabase-patterns`, `tanstack-query`, `testing-patterns`
+**Tech-stack skills available:** `csharp-dotnet`, `vbnet-patterns`, `cobol-fujitsu`, `dotnet-cobol-interop`
 
 ### database-admin
 
-Database design, optimization, and data layer implementation. Stack-adaptive — detects the database type and ORM/migration tooling on first invocation.
+Data layer design, optimization, and implementation. Specializes in the hybrid COBOL + OOP + .NET data layer architecture used at Global Shop Solutions.
 
 **Responsibilities:**
-- Schema design and migrations (Supabase, Prisma, Drizzle, Django ORM, SQLAlchemy, Mongoose, Knex)
-- Query optimization and indexing
-- RLS policies and data integrity
-- Minimal tests for data integrity only
+- COBOL data layer programs — file I/O, record layouts, copybook definitions (`.cpy`)
+- OOP wrappers that bridge COBOL data access with .NET (C#/VB.NET interop)
+- Database schema changes and stored procedures (SQL Server)
+- Data integrity, indexing, and query optimization
+- Minimal tests for data integrity and interop boundaries only
 
 **Protection rules:**
-- Never reset databases without explicit user approval
-- Never deploy to production without explicit user approval
+- Never modify production copybooks or data files without explicit user approval
+- Never deploy COBOL changes to production without explicit user approval
+- Always validate record layouts against existing copybooks before changes
 - Always work locally first
 
 ### shipper
@@ -239,11 +243,10 @@ Referenced automatically by full-stack-developer and database-admin when the mat
 
 | Skill | Patterns Covered |
 |-------|-----------------|
-| `nextjs-app-router` | Server/Client Components, App Router, API routes, data fetching |
-| `shadcn-components` | CVA variants, Radix UI primitives, form components, Tailwind |
-| `supabase-patterns` | RLS policies, migrations, Edge Functions, TypeScript integration |
-| `tanstack-query` | Data fetching, caching, mutations, optimistic updates |
-| `testing-patterns` | Jest, React Testing Library, Playwright E2E, component testing |
+| `csharp-dotnet` | C# conventions, .NET Framework / .NET 6+, WinForms, WPF, ASP.NET, dependency injection |
+| `vbnet-patterns` | VB.NET idioms, legacy modernization, .NET interop, Option Strict/Explicit conventions |
+| `cobol-fujitsu` | Fujitsu NetCOBOL syntax, copybooks, file I/O, PERFORM/EVALUATE patterns, paragraph structure |
+| `dotnet-cobol-interop` | Managed/unmanaged interop, P/Invoke, COM wrappers, data marshalling between .NET and COBOL |
 
 ---
 
