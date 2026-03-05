@@ -1,18 +1,20 @@
 # AGENTS.md — Lean Agile Team
 
-This plugin provides a multi-agent development system for Claude Code. Seven specialized agents coordinate through shared task lists to ship features, fix bugs, refactor code, run tests, and maintain documentation.
+> **Universal agent instructions.** This file is the single source of truth for all AI coding tools. Tool-specific adapter files (`.cursorrules`, `.github/copilot-instructions.md`, `.windsurfrules`, `.clinerules`) reference this document. See [Cross-Tool Compatibility](#cross-tool-compatibility) at the bottom.
+
+This project uses a multi-agent development system. Seven specialized roles coordinate through shared task lists to ship features, fix bugs, refactor code, run tests, and maintain documentation.
 
 ## Agents
 
-| Agent | Role | Model | Tools | Key Traits |
-|-------|------|-------|-------|------------|
-| **full-stack-developer** | Frontend, backend, APIs, UI, data fetching | Sonnet | Read, Write, Edit, MultiEdit, Bash, Grep, Glob | Stack-adaptive, worktree isolation, project memory |
-| **database-admin** | Schema, migrations, queries, data integrity | Sonnet | Read, Write, Edit, MultiEdit, Bash, Grep, Glob | Stack-adaptive, worktree isolation, project memory |
-| **shipper** | Git, testing, building, deployment, PRs | Sonnet | Bash, Read, Grep, Glob | Pipeline owner, acceptEdits permission |
-| **reviewer** | Security, bugs, performance review | Sonnet | Read, Grep, Glob, Bash | Read-only (plan mode), non-blocking except security |
-| **documentor** | Documentation creation and maintenance | Sonnet | Read, Write, Edit, Glob, Grep, Bash | Runs after tests pass |
-| **meta-agent** | Generate new custom agents | Opus | Write, Read, Grep, Glob, WebFetch | On-demand agent creation |
-| **meta-skills-agent** | Generate new workflow skills | Opus | Read, Write, WebFetch, Grep, Glob | On-demand skill creation |
+| Agent | Role | Capabilities | Key Traits |
+|-------|------|-------------|------------|
+| **full-stack-developer** | Frontend, backend, APIs, UI, data fetching | Read, write, edit files; run commands; search code | Stack-adaptive, isolated workspace, project memory |
+| **database-admin** | Schema, migrations, queries, data integrity | Read, write, edit files; run commands; search code | Stack-adaptive, isolated workspace, project memory |
+| **shipper** | Git, testing, building, deployment, PRs | Run commands; read and search files | Pipeline owner, full automation access |
+| **reviewer** | Security, bugs, performance review | Read and search files only | Read-only, non-blocking except security |
+| **documentor** | Documentation creation and maintenance | Read, write, edit files; run commands; search code | Runs after tests pass |
+| **meta-agent** | Generate new custom agents | Write, read, search files; fetch web docs | On-demand agent creation |
+| **meta-skills-agent** | Generate new workflow skills | Read, write files; fetch web docs; search code | On-demand skill creation |
 
 ### full-stack-developer
 
@@ -82,11 +84,11 @@ Creates, maintains, and organizes codebase documentation in `docs/`.
 
 ### meta-agent
 
-Generates new agent configuration files from a user description. Fetches latest Claude Code docs, analyzes requirements, selects appropriate tools/model/settings, and writes a complete agent `.md` file to `agents/`.
+Generates new agent configuration files from a user description. Analyzes requirements, selects appropriate tools and settings, and writes a complete agent definition file to `agents/`.
 
 ### meta-skills-agent
 
-Generates new workflow skill files from a user description. Reads existing skill patterns for reference, determines agent involvement and task dependencies, and writes a complete `SKILL.md` to `.claude/skills/`.
+Generates new workflow skill files from a user description. Reads existing skill patterns for reference, determines agent involvement and task dependencies, and writes a complete skill definition file.
 
 ---
 
@@ -279,22 +281,20 @@ Validates git state when the shipper finishes:
 
 ## Coordination Model
 
-### Agent Teams Mode (recommended)
+### Parallel Execution (recommended)
 
-Enabled automatically via `settings.json` (`CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`):
+When the AI tool supports multi-agent or parallel execution:
 
-- Agents spawn as real teammates that work in parallel
-- Shared task lists with dependency tracking (`TaskCreate`, `TaskUpdate`, `TaskList`, `TaskGet`)
+- Agents work in parallel where workflows allow (e.g., full-stack-developer + database-admin)
+- Shared task lists with dependency tracking
 - Tasks specify owners and blocked-by dependencies
-- Parallelism where workflows allow (e.g., full-stack-developer + database-admin)
 
 ### Sequential Fallback
 
-Without Agent Teams, skills degrade gracefully:
+When parallel execution is not available:
 
-- Agents execute sequentially via `Task()` calls
+- Execute agents sequentially in the order specified by each workflow
 - Same workflow steps and quality gates
-- Works on any Claude Code version
 - Slightly slower due to serial execution
 
 ### Conventions
@@ -304,3 +304,19 @@ Without Agent Teams, skills degrade gracefully:
 - **Reviews:** Non-blocking except for CRITICAL security issues
 - **Testing:** Minimal — test only what could break production
 - **Shipping:** Working software over perfect software
+
+---
+
+## Cross-Tool Compatibility
+
+This `AGENTS.md` is the single source of truth. The following adapter files are provided for tool-specific auto-discovery:
+
+| File | Tool | How It Works |
+|------|------|-------------|
+| `AGENTS.md` | Any AI tool | Universal format — plain markdown, model-agnostic |
+| `.cursor/rules/*.mdc` | Cursor | Modular rules with glob-based activation |
+| `.github/copilot-instructions.md` | GitHub Copilot | Copilot custom instructions |
+| `.windsurfrules` | Windsurf | Windsurf project rules |
+| `.clinerules` | Cline | Cline project rules |
+
+All adapter files reference the same workflows and conventions defined above. When updating agent behavior, edit this `AGENTS.md` first, then sync the adapter files.
