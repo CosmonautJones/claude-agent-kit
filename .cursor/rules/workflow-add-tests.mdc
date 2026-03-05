@@ -1,0 +1,43 @@
+---
+description: Critical test coverage workflow — write minimal tests for the most important code paths. Use when adding test coverage to existing code.
+globs:
+alwaysApply: false
+---
+
+# Add Tests — Critical Test Coverage
+
+Test the 20% that prevents 80% of disasters. Time-boxed effort.
+
+## Workflow Pipeline
+
+```
+Shipper ──► Reviewer ──► Full Stack Dev + DB Admin (parallel) ──► Shipper ──► Documentor ──► Shipper
+Branch       Identify       Write Tests                           Run Tests    Update Docs    Commit+PR
+             Critical Gaps
+```
+
+## Steps
+
+| # | Task | Role | Blocked By |
+|---|------|------|------------|
+| 1 | Create branch `test/critical-coverage-<area>` from main | Shipper | — |
+| 2 | Identify CRITICAL untested code paths | Reviewer | 1 |
+| 3 | Write minimal tests for critical application paths | Full Stack Dev | 2 |
+| 4 | Write minimal tests for critical data integrity paths (if needed) | DB Admin | 2 |
+| 5 | Run full test suite including new tests | Shipper | 3, 4 |
+| 6 | Update documentation for new test coverage | Documentor | 5 |
+| 7 | Commit and create PR to main | Shipper | 5, 6 |
+
+## What Counts as Critical
+
+**Test these (could cause disasters):**
+- Authentication and authorization flows
+- Data loss or corruption paths
+- Payment and money flows
+- Production outage scenarios
+
+**Skip these:**
+- UI formatting and styling
+- Nice-to-have features
+- Edge cases that won't impact production
+- Anything that can be quickly fixed if it breaks
