@@ -1,6 +1,6 @@
 # AGENTS.md — Lean Agile Team
 
-> **Universal agent instructions.** This file is the single source of truth for all AI coding tools. Tool-specific adapter files (`.cursorrules`, `.github/copilot-instructions.md`, `.windsurfrules`, `.clinerules`) reference this document. See [Cross-Tool Compatibility](#cross-tool-compatibility) at the bottom.
+> **Universal agent instructions.** This file is the single source of truth for Claude Code, Codex, and Cursor. Cursor-specific rules live in `.cursor/rules/*.mdc`. See [Cross-Tool Compatibility](#cross-tool-compatibility) at the bottom.
 
 This project uses a multi-agent development system. Seven specialized roles coordinate through shared task lists to ship features, fix bugs, refactor code, run tests, and maintain documentation.
 
@@ -309,14 +309,15 @@ When parallel execution is not available:
 
 ## Cross-Tool Compatibility
 
-This `AGENTS.md` is the single source of truth. The following adapter files are provided for tool-specific auto-discovery:
+This `AGENTS.md` is the single source of truth for all three supported tools:
 
 | File | Tool | How It Works |
 |------|------|-------------|
-| `AGENTS.md` | Any AI tool | Universal format — plain markdown, model-agnostic |
+| `AGENTS.md` | Claude Code, Codex | Both auto-discover `AGENTS.md` at the repo root |
 | `.cursor/rules/*.mdc` | Cursor | Modular rules with glob-based activation |
-| `.github/copilot-instructions.md` | GitHub Copilot | Copilot custom instructions |
-| `.windsurfrules` | Windsurf | Windsurf project rules |
-| `.clinerules` | Cline | Cline project rules |
 
-All adapter files reference the same workflows and conventions defined above. When updating agent behavior, edit this `AGENTS.md` first, then sync the adapter files.
+- **Claude Code** reads `AGENTS.md` as project-level agent instructions automatically.
+- **Codex** (OpenAI) reads `AGENTS.md` from the repo root as its instruction file.
+- **Cursor** uses `.cursor/rules/*.mdc` files which contain the same workflows and conventions in Cursor's native format.
+
+When updating agent behavior, edit this `AGENTS.md` first, then sync the `.cursor/rules/` files.
