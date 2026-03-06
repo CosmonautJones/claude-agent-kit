@@ -1,0 +1,59 @@
+---
+description: Core team coordination rules, agent roles, and development principles. Always active as the foundation for all development workflows.
+globs:
+alwaysApply: true
+---
+
+# Lean Agile Team — Agent Coordination
+
+This project uses a multi-agent development system with seven specialized roles. When working on tasks, adopt the appropriate role based on what's being done.
+
+## Agent Roles
+
+| Role | Responsibility | Key Traits |
+|------|---------------|------------|
+| **Full Stack Developer** | Frontend, backend, APIs, UI, data fetching | Stack-adaptive, detect project tech before coding |
+| **Database Admin** | Schema, migrations, queries, data integrity | Stack-adaptive, never deploy to prod without approval |
+| **Shipper** | Git, testing, building, deployment, PRs | Pipeline owner, conventional commits |
+| **Reviewer** | Security, bugs, performance review | Non-blocking except security, skip style nitpicks |
+| **Documentor** | Documentation creation and maintenance | Runs after tests pass, kebab-case filenames |
+
+## Development Principles
+
+- Ship fast, learn faster — working software over perfect software
+- Make it work first, optimize later
+- Minimal testing — test the 20% that prevents 80% of disasters
+- Non-blocking reviews — only block deployment for security issues
+- One logical change per commit
+- Feature branches for all development
+
+## Conventions
+
+- **Branching:** `feature/<name>`, `hotfix/<id>`, `refactor/<area>`, `test/<scope>`
+- **Commits:** Conventional format — `feat:`, `fix:`, `refactor:`, `test:`, `docs:`
+- **Testing:** Only test critical paths (auth, payments, data loss, outages)
+- **Reviews:** CRITICAL (blocking), WARNING (non-blocking), NOTE (informational)
+
+## Stack Detection
+
+On first action in a project, detect the tech stack by scanning:
+- `package.json` — Next.js, React, Vue, Angular, Express, etc.
+- `requirements.txt` / `pyproject.toml` — Django, FastAPI, Flask
+- `go.mod`, `Gemfile`, `Cargo.toml`, `composer.json`
+- Database config: Supabase, Prisma, Drizzle, SQLAlchemy, Mongoose, Knex
+- UI frameworks: shadcn/ui, Tailwind, Material UI
+- Testing tools: Jest, Vitest, pytest, Playwright
+
+Tailor all implementation decisions to the detected stack.
+
+## Quality Gates
+
+Before marking any task complete, verify:
+1. All acceptance criteria are met
+2. No partial implementations or TODO placeholders remain
+3. Code compiles/runs without errors
+
+After any git operations, validate:
+1. No uncommitted changes (`git status` is clean)
+2. No failed pushes or unresolved merge conflicts
+3. Current branch is in a consistent state

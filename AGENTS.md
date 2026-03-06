@@ -1,47 +1,53 @@
 # AGENTS.md — Lean Agile Team
 
-This plugin provides a multi-agent development system for Claude Code. Seven specialized agents coordinate through shared task lists to ship features, fix bugs, refactor code, run tests, and maintain documentation.
+> **Universal agent instructions.** This file is the single source of truth for Claude Code, Codex, and Cursor. Cursor-specific rules live in `.cursor/rules/*.mdc`. See [Cross-Tool Compatibility](#cross-tool-compatibility) at the bottom.
+
+This project uses a multi-agent development system. Seven specialized roles coordinate through shared task lists to ship features, fix bugs, refactor code, run tests, and maintain documentation.
 
 ## Agents
 
-| Agent | Role | Model | Tools | Key Traits |
-|-------|------|-------|-------|------------|
-| **full-stack-developer** | Frontend, backend, APIs, UI, data fetching | Sonnet | Read, Write, Edit, MultiEdit, Bash, Grep, Glob | Stack-adaptive, worktree isolation, project memory |
-| **database-admin** | Schema, migrations, queries, data integrity | Sonnet | Read, Write, Edit, MultiEdit, Bash, Grep, Glob | Stack-adaptive, worktree isolation, project memory |
-| **shipper** | Git, testing, building, deployment, PRs | Sonnet | Bash, Read, Grep, Glob | Pipeline owner, acceptEdits permission |
-| **reviewer** | Security, bugs, performance review | Sonnet | Read, Grep, Glob, Bash | Read-only (plan mode), non-blocking except security |
-| **documentor** | Documentation creation and maintenance | Sonnet | Read, Write, Edit, Glob, Grep, Bash | Runs after tests pass |
-| **meta-agent** | Generate new custom agents | Opus | Write, Read, Grep, Glob, WebFetch | On-demand agent creation |
-| **meta-skills-agent** | Generate new workflow skills | Opus | Read, Write, WebFetch, Grep, Glob | On-demand skill creation |
+| Agent | Role | Capabilities | Key Traits |
+|-------|------|-------------|------------|
+| **full-stack-developer** | C#, VB.NET, COBOL (Fujitsu), .NET interop | Read, write, edit files; run commands; search code | Stack-adaptive, isolated workspace, project memory |
+| **database-admin** | COBOL data layer, .NET interop, SQL Server, data integrity | Read, write, edit files; run commands; search code | Stack-adaptive, isolated workspace, project memory |
+| **shipper** | Git, testing, building, deployment, PRs | Run commands; read and search files | Pipeline owner, full automation access |
+| **reviewer** | Security, bugs, performance review | Read and search files only | Read-only, non-blocking except security |
+| **documentor** | Documentation creation and maintenance | Read, write, edit files; run commands; search code | Runs after tests pass |
+| **meta-agent** | Generate new custom agents | Write, read, search files; fetch web docs | On-demand agent creation |
+| **meta-skills-agent** | Generate new workflow skills | Read, write files; fetch web docs; search code | On-demand skill creation |
 
 ### full-stack-developer
 
-Rapid feature implementation across the entire stack. Stack-adaptive — detects the project's tech stack on first invocation by scanning `package.json`, `requirements.txt`, `go.mod`, `Gemfile`, `Cargo.toml`, `composer.json` and tailors approach accordingly.
+Feature implementation across the Global Shop Solutions stack. Detects project context by scanning `.sln`, `.csproj`, `.vbproj`, COBOL copybooks (`.cpy`), and `.cob`/`.cobol` source files.
+
+**Primary languages:** C#, VB.NET, COBOL (Fujitsu NetCOBOL)
 
 **Responsibilities:**
-- All frontend and backend development
-- API routes, endpoints, and integrations
-- UI components following project conventions
-- Forms with validation, data fetching, state management
-- Minimal tests for critical paths only (auth, payments, data loss)
+- C# and VB.NET application development (.NET Framework / .NET 6+)
+- COBOL program maintenance and new development (Fujitsu NetCOBOL)
+- Interop between .NET managed code and COBOL modules
+- Windows Forms, WPF, or web UI following project conventions
+- Minimal tests for critical paths only (data integrity, business logic, interop boundaries)
 
-**Boundaries:** Does not modify database migrations directly (delegates to database-admin). Does not push to main without review.
+**Boundaries:** Does not modify the COBOL data layer or copybook definitions directly (delegates to database-admin). Does not push to main without review.
 
-**Tech-stack skills available:** `nextjs-app-router`, `shadcn-components`, `supabase-patterns`, `tanstack-query`, `testing-patterns`
+**Tech-stack skills available:** `csharp-dotnet`, `vbnet-patterns`, `cobol-fujitsu`, `dotnet-cobol-interop`
 
 ### database-admin
 
-Database design, optimization, and data layer implementation. Stack-adaptive — detects the database type and ORM/migration tooling on first invocation.
+Data layer design, optimization, and implementation. Specializes in the hybrid COBOL + OOP + .NET data layer architecture used at Global Shop Solutions.
 
 **Responsibilities:**
-- Schema design and migrations (Supabase, Prisma, Drizzle, Django ORM, SQLAlchemy, Mongoose, Knex)
-- Query optimization and indexing
-- RLS policies and data integrity
-- Minimal tests for data integrity only
+- COBOL data layer programs — file I/O, record layouts, copybook definitions (`.cpy`)
+- OOP wrappers that bridge COBOL data access with .NET (C#/VB.NET interop)
+- Database schema changes and stored procedures (SQL Server)
+- Data integrity, indexing, and query optimization
+- Minimal tests for data integrity and interop boundaries only
 
 **Protection rules:**
-- Never reset databases without explicit user approval
-- Never deploy to production without explicit user approval
+- Never modify production copybooks or data files without explicit user approval
+- Never deploy COBOL changes to production without explicit user approval
+- Always validate record layouts against existing copybooks before changes
 - Always work locally first
 
 ### shipper
@@ -82,11 +88,11 @@ Creates, maintains, and organizes codebase documentation in `docs/`.
 
 ### meta-agent
 
-Generates new agent configuration files from a user description. Fetches latest Claude Code docs, analyzes requirements, selects appropriate tools/model/settings, and writes a complete agent `.md` file to `agents/`.
+Generates new agent configuration files from a user description. Analyzes requirements, selects appropriate tools and settings, and writes a complete agent definition file to `agents/`.
 
 ### meta-skills-agent
 
-Generates new workflow skill files from a user description. Reads existing skill patterns for reference, determines agent involvement and task dependencies, and writes a complete `SKILL.md` to `.claude/skills/`.
+Generates new workflow skill files from a user description. Reads existing skill patterns for reference, determines agent involvement and task dependencies, and writes a complete skill definition file.
 
 ---
 
@@ -237,11 +243,10 @@ Referenced automatically by full-stack-developer and database-admin when the mat
 
 | Skill | Patterns Covered |
 |-------|-----------------|
-| `nextjs-app-router` | Server/Client Components, App Router, API routes, data fetching |
-| `shadcn-components` | CVA variants, Radix UI primitives, form components, Tailwind |
-| `supabase-patterns` | RLS policies, migrations, Edge Functions, TypeScript integration |
-| `tanstack-query` | Data fetching, caching, mutations, optimistic updates |
-| `testing-patterns` | Jest, React Testing Library, Playwright E2E, component testing |
+| `csharp-dotnet` | C# conventions, .NET Framework / .NET 6+, WinForms, WPF, ASP.NET, dependency injection |
+| `vbnet-patterns` | VB.NET idioms, legacy modernization, .NET interop, Option Strict/Explicit conventions |
+| `cobol-fujitsu` | Fujitsu NetCOBOL syntax, copybooks, file I/O, PERFORM/EVALUATE patterns, paragraph structure |
+| `dotnet-cobol-interop` | Managed/unmanaged interop, P/Invoke, COM wrappers, data marshalling between .NET and COBOL |
 
 ---
 
@@ -279,22 +284,20 @@ Validates git state when the shipper finishes:
 
 ## Coordination Model
 
-### Agent Teams Mode (recommended)
+### Parallel Execution (recommended)
 
-Enabled automatically via `settings.json` (`CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`):
+When the AI tool supports multi-agent or parallel execution:
 
-- Agents spawn as real teammates that work in parallel
-- Shared task lists with dependency tracking (`TaskCreate`, `TaskUpdate`, `TaskList`, `TaskGet`)
+- Agents work in parallel where workflows allow (e.g., full-stack-developer + database-admin)
+- Shared task lists with dependency tracking
 - Tasks specify owners and blocked-by dependencies
-- Parallelism where workflows allow (e.g., full-stack-developer + database-admin)
 
 ### Sequential Fallback
 
-Without Agent Teams, skills degrade gracefully:
+When parallel execution is not available:
 
-- Agents execute sequentially via `Task()` calls
+- Execute agents sequentially in the order specified by each workflow
 - Same workflow steps and quality gates
-- Works on any Claude Code version
 - Slightly slower due to serial execution
 
 ### Conventions
@@ -304,3 +307,20 @@ Without Agent Teams, skills degrade gracefully:
 - **Reviews:** Non-blocking except for CRITICAL security issues
 - **Testing:** Minimal — test only what could break production
 - **Shipping:** Working software over perfect software
+
+---
+
+## Cross-Tool Compatibility
+
+This `AGENTS.md` is the single source of truth for all three supported tools:
+
+| File | Tool | How It Works |
+|------|------|-------------|
+| `AGENTS.md` | Claude Code, Codex | Both auto-discover `AGENTS.md` at the repo root |
+| `.cursor/rules/*.mdc` | Cursor | Modular rules with glob-based activation |
+
+- **Claude Code** reads `AGENTS.md` as project-level agent instructions automatically.
+- **Codex** (OpenAI) reads `AGENTS.md` from the repo root as its instruction file.
+- **Cursor** uses `.cursor/rules/*.mdc` files which contain the same workflows and conventions in Cursor's native format.
+
+When updating agent behavior, edit this `AGENTS.md` first, then sync the `.cursor/rules/` files.

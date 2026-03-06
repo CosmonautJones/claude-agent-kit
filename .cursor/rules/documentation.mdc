@@ -1,0 +1,39 @@
+---
+description: Documentation rules — creation, maintenance, and organization standards. Apply when creating or updating documentation.
+globs: "docs/**,**/*.md,**/README*"
+alwaysApply: false
+---
+
+# Documentation Rules
+
+## When to Document
+
+- After feature completion
+- After code changes that affect behavior
+- When documentation is explicitly requested
+
+## Documentation Types
+
+### Full Generation (init-docs)
+1. Read project root files to identify project type and tech stack
+2. Scan source directories to map architecture
+3. Create `docs/` directory structure:
+   - `docs/README.md` — main table of contents
+   - `docs/architecture/` — system design
+   - `docs/api/` — API documentation
+   - `docs/guides/` — how-to guides
+   - `docs/reference/` — configuration and reference
+4. Build navigation with cross-references
+
+### Incremental Update (update-docs)
+1. Run `git diff --name-only HEAD~10` to identify recently changed files
+2. Determine which existing docs are affected
+3. Update affected documents, add new sections, remove obsolete content
+4. Verify cross-links and table of contents
+
+## Standards
+
+- **File naming:** kebab-case (`user-authentication.md`)
+- **Structure:** Title → Overview → Main sections → Examples → Related Documents
+- **Writing:** Clear, concise, practical examples, explain "why" not just "what"
+- **Cross-linking:** Relative paths, bidirectional links, update on moves/renames

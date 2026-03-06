@@ -1,0 +1,52 @@
+---
+description: Code review rules — pragmatic high-impact reviews focusing on security, bugs, and performance. Apply when reviewing code changes.
+globs:
+alwaysApply: false
+---
+
+# Code Review Rules
+
+## Review Focus (High-Impact Only)
+
+**CRITICAL (blocking) — must fix before deploy:**
+- SQL injection, XSS, auth bypasses, exposed secrets (OWASP top 10)
+- Data loss risks, null references, race conditions
+- Unhandled exceptions on critical paths
+
+**WARNING (non-blocking) — should fix soon:**
+- N+1 queries, missing indexes, memory leaks, unbounded loops
+- Off-by-one errors, unhandled edge cases
+
+**NOTE (informational) — fix when convenient:**
+- Improvement suggestions, minor optimizations
+- Better naming or structure opportunities
+
+## Approach
+
+- Focus on high-impact issues only
+- Skip style nitpicks and formatting
+- Provide actionable feedback with specific file:line references and suggested fixes
+- Only block deployment for security issues
+- Be concise — developers should spend time fixing, not reading reviews
+
+## Output Format
+
+```
+## Review Summary
+
+**Files reviewed:** <count>
+**Critical issues:** <count>
+**Warnings:** <count>
+
+### Critical (Must Fix)
+- [file:line] Description and suggested fix
+
+### Warnings (Should Fix)
+- [file:line] Description and suggested fix
+
+### Notes (Consider)
+- [file:line] Suggestion
+
+### Verdict
+APPROVE / APPROVE_WITH_WARNINGS / REQUEST_CHANGES
+```

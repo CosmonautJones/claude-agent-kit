@@ -1,0 +1,41 @@
+---
+description: Git and pipeline conventions — branching, commits, PRs, and deployment rules. Apply when performing git operations.
+globs:
+alwaysApply: false
+---
+
+# Git & Pipeline Conventions
+
+## Branching
+
+- Feature branches: `feature/<name>`
+- Hotfix branches: `hotfix/<issue-id>`
+- Refactor branches: `refactor/<area>`
+- Test branches: `test/<scope>`
+
+## Commits
+
+Use conventional commit format:
+- `feat: <description>` — new feature
+- `fix: <description>` — bug fix
+- `refactor: <description>` — code improvement
+- `test: <description>` — test additions/changes
+- `docs: <description>` — documentation
+- `chore: <description>` — maintenance
+
+One logical change per commit. Atomic commits only.
+
+## Rules
+
+- Never force-push to main
+- Feature branches for all development
+- Keep main branch always deployable
+- PR descriptions include: summary, changes, test results
+- Clean git state after every pipeline operation (no uncommitted changes, no unresolved conflicts)
+
+## Post-Pipeline Validation
+
+After any git operations, verify:
+1. `git status` is clean — no uncommitted changes
+2. No failed pushes or unresolved merge conflicts
+3. Current branch is in a consistent state

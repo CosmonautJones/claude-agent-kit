@@ -1,0 +1,40 @@
+---
+description: Batch test and fix workflow — run all tests, fix failures, loop until green. Use when running comprehensive test suites.
+globs:
+alwaysApply: false
+---
+
+# Run Tests — Batch Test and Fix
+
+Run all tests, batch-fix failures, and verify. Loops until green.
+
+## Workflow Pipeline
+
+```
+Shipper ──► Shipper ──► Full Stack Dev + DB Admin ──► Shipper ──► Shipper ──► Reviewer ──► Documentor ──► Shipper
+Branch       Run tests    Fix failures (parallel)      Commit      Re-test     Review       Update Docs     PR
+                              ↑                                       │
+                              └───────── loop if still failing ───────┘
+```
+
+## Steps
+
+| # | Task | Role | Blocked By |
+|---|------|------|------------|
+| 1 | Create branch `test/<timestamp>` from main | Shipper | — |
+| 2 | Run full test suite, compile failure report | Shipper | 1 |
+| 3 | Fix application test failures | Full Stack Dev | 2 |
+| 4 | Fix data layer test failures | DB Admin | 2 |
+| 5 | Commit all fixes | Shipper | 3, 4 |
+| 6 | Re-run previously failed tests | Shipper | 5 |
+| 7 | Run full validation suite | Shipper | 6 |
+| 8 | Review all fixes for quality | Reviewer | 7 |
+| 9 | Update documentation if fixes affect docs | Documentor | 8 |
+| 10 | Create PR to main with test report | Shipper | 8, 9 |
+
+## Key Points
+
+- Steps 3 and 4 run in parallel
+- If step 6 finds remaining failures, create new fix tasks and loop back
+- Continue looping until all tests pass
+- PR includes a comprehensive test report

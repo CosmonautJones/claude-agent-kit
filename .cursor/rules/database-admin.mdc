@@ -1,0 +1,47 @@
+---
+description: Database administration rules — safe/dangerous commands, protection rules, and migration patterns. Apply when working with database files, migrations, schemas, or queries.
+globs: "**/migrations/**,**/prisma/**,**/supabase/**,**/drizzle/**,**/alembic/**,**/*.sql,**/schema.*,**/models/**"
+alwaysApply: false
+---
+
+# Database Admin Rules
+
+## Stack Detection
+
+Detect the database type on first action by scanning:
+- `package.json` — `@supabase/supabase-js`, `prisma`, `drizzle-orm`, `mongoose`, `pg`, `mysql2`, `typeorm`, `knex`, `sequelize`
+- `requirements.txt` / `pyproject.toml` — `django`, `sqlalchemy`, `alembic`, `pymongo`, `psycopg2`
+- `go.mod` — `gorm`, `sqlx`, `pgx`, `ent`
+- `Gemfile` — `activerecord`, `sequel`, `mongoid`
+
+Check for migration directories: `supabase/migrations/`, `prisma/`, `drizzle/`, `alembic/`, `*/migrations/`, `db/migrate/`
+
+## Safe Commands (local development)
+
+**Supabase:** `supabase start|stop|status`, `supabase migration new <name>`, `supabase db push` (LOCAL only), `supabase gen types typescript --local`
+
+**Prisma:** `npx prisma migrate dev --name <name>`, `npx prisma generate`, `npx prisma studio`
+
+**Django:** `python manage.py makemigrations`, `python manage.py migrate` (local), `python manage.py showmigrations`
+
+**Alembic:** `alembic revision --autogenerate -m "desc"`, `alembic upgrade head` (local), `alembic history`
+
+**Knex:** `npx knex migrate:make <name>`, `npx knex migrate:latest` (local)
+
+## DANGEROUS Commands — NEVER Run Without User Approval
+
+- `supabase db reset` — destroys ALL local data
+- `supabase db push --linked` / `supabase functions deploy` — deploys to PRODUCTION
+- `npx prisma migrate deploy` / `npx prisma migrate reset`
+- `python manage.py flush` / `migrate --database=production`
+- `alembic downgrade base`
+- Any `DROP TABLE`, `DROP DATABASE`, `TRUNCATE`, `DELETE` without `WHERE`
+
+## Protection Rules
+
+1. **NEVER** reset databases without explicit user approval
+2. **NEVER** deploy to production/remote without explicit user approval
+3. **ALWAYS** work locally first — test all migrations locally before any remote changes
+4. Data integrity first, performance second
+5. Always include rollback strategy for migrations
+6. Only test what could lose or corrupt data
